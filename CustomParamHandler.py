@@ -306,7 +306,22 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IExtensionStateListener, 
 
             for working_tab in self.maintab.get_config_tabs():
                 selected_item = working_tab.param_handl_combo_cached.getSelectedItem()
-                working_tab.param_handl_combo_cached.removeAllItems()
+                list_cacheditems = list(())
+                working_tab_numcacheditems = working_tab.param_handl_combo_cached.getItemCount()
+                self.logger.debug('Cached previous_tab_item count initial for tab "{}": {}'.format(working_tab.namepane_txtfield.getText(), working_tab_numcacheditems))
+				
+                n = 0
+                while n < working_tab_numcacheditems:
+                    list_cacheditems.append(working_tab.param_handl_combo_cached.getItemAt(n))
+                    n += 1
+					
+                self.logger.debug('Cached item 0 on "{}": "{}"'.format(working_tab.namepane_txtfield.getText(), working_tab.param_handl_combo_cached.getItemAt(0)))
+				
+                self.logger.debug('Cached items on "{}": "{}"'.format(working_tab.namepane_txtfield.getText(), list_cacheditems))
+                self.logger.debug('Count of PIE in cached items: "{}"'.format(str(list_cacheditems.count('pie'))))
+
+				
+				#working_tab.param_handl_combo_cached.removeAllItems()
                 if self.is_in_cph_scope(req_as_string, True, working_tab) or self.is_in_cph_scope(resp_as_string, False, working_tab):
                     working_tab.cached_request  = req
                     working_tab.cached_response = resp
@@ -319,11 +334,38 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, IExtensionStateListener, 
                     empty_req, empty_resp = previous_tab.initialize_req_resp()
                     if previous_tab.cached_request == empty_req or previous_tab.cached_response == empty_resp:
                         continue
-                    item = previous_tab.namepane_txtfield.getText()
-                    working_tab.param_handl_combo_cached.addItem(item)
-                    if item == selected_item:
-                        working_tab.param_handl_combo_cached.setSelectedItem(item)
+                    previous_tab_item = previous_tab.namepane_txtfield.getText()
+					
+                    if list_cacheditems.count(previous_tab_item) < 1: 
+					    working_tab.param_handl_combo_cached.addItem(previous_tab_item)
+                    #working_tab.param_handl_combo_cached.addItem(previous_tab_item)
+					
+					#if previous_tab_item == selected_item:
+                    #    working_tab.param_handl_combo_cached.setSelectedItem(previous_tab_item)
+					
+				# begin removal check
+                working_tab_num_cacheditems = working_tab.param_handl_combo_cached.getItemCount()
+				
+                p = 0
+                while p < working_tab_num_cacheditems:
+                    cached_item_for_removalcheck = working_tab.param_handl_combo_cached.getItemAt(p)
+                    list_current_tabs = list(())
+                    for current_tab in self.maintab.get_config_tabs():
+                        list_current_tabs.append(current_tab.namepane_txtfield.getText())
+                    if list_current_tabs.count(cached_item_for_removalcheck) < 1:
+                        working_tab.param_handl_combo_cached.removeItemAt(p)
+                    p += 1
+				# end removal check
 
+                numtotalitems = working_tab.param_handl_combo_cached.getItemCount()
+                self.logger.debug('Cached previous_tab_item count for tab "{}": {}'.format(working_tab.namepane_txtfield.getText(), numtotalitems))
+				
+				# param_handl_combo_cached indices debugging
+                i = 0
+                while i < numtotalitems:
+                    self.logger.debug('Cached item at index {} on tab "{}": "{}"'.format(i, working_tab.namepane_txtfield.getText(), working_tab.param_handl_combo_cached.getItemAt(i)))
+                    i += 1					
+					
     def is_in_cph_scope(self, msg_as_string, is_request, tab):
         rms_scope_all  = tab.msg_mod_combo_scope.getSelectedItem() == tab.MSG_MOD_COMBO_SCOPE_ALL
         rms_scope_some = tab.msg_mod_combo_scope.getSelectedItem() == tab.MSG_MOD_COMBO_SCOPE_SOME
