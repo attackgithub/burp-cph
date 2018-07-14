@@ -1041,6 +1041,7 @@ class ConfigTab(SubTab):
         self.param_handl_button_extract_single_help = self.HelpButton(CPH_Help.extract_single.title, CPH_Help.extract_single.message, SubTab.DOCS_URL + '#quickstart/extract_single')
         self.param_handl_button_extract_macro_help = self.HelpButton(CPH_Help.extract_macro.title, CPH_Help.extract_macro.message, SubTab.DOCS_URL + '#quickstart/extract_macro')
         self.param_handl_button_extract_cached_help = self.HelpButton(CPH_Help.extract_cached.title, CPH_Help.extract_cached.message, SubTab.DOCS_URL + '#quickstart/extract_cached')
+		
         self.param_handl_combo_cached = JComboBox()
         self.param_handl_combo_cached.addActionListener(self)
 
